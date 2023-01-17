@@ -4,7 +4,7 @@
             <!-- stateInputObjName для того чтобы передать имя объекта шаблона инпутов (которые в state) в SingleInput.vue а оттуда вернуть в state мутацию, которая изменит данные нужного объекта - inpForRegisterForm или inpForLoginForm -->
             <SingleInput :inp="inp" :ind="ind" :stateInputObjName="stateInputObjName" />
         </div>
-        <div class="login-errors">
+        <div class="errors">
             <p v-show="getLoginResult">{{ getLoginResult }}</p>
         </div>
         <div class="app-form__agree">
@@ -60,13 +60,5 @@ export default {
     // from global.css
 }
 
-.login-errors {
-    text-align: left;
 
-    p {
-        font-size: 14px;
-        color: red;
-        margin: 0;
-    }
-}
 </style>

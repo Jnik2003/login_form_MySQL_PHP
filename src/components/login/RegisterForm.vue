@@ -4,6 +4,9 @@
             <!-- stateInputObjName для того чтобы передать имя объекта шаблона инпутов (которые в state) в SingleInput.vue а оттуда вернуть в state мутацию, которая изменит данные нужного объекта - inpForRegisterForm или inpForLoginForm -->
             <SingleInput :inp="inp" :ind="ind" :stateInputObjName="stateInputObjName"/>
         </div>
+        <div class="errors">
+            <p v-show="getRegisterResult">{{ getRegisterResult }}</p>
+        </div>
         <div class="app-form__agree">
             <label class="app-form__agree--label">
                 <input type="checkbox" v-model="isAgree">
@@ -14,7 +17,7 @@
             </label>
         </div>
         <div>
-            <button class="btn app-form__btn" :disabled="(enableBtn === false || isAgree === false)">Регистрация</button>
+            <button class="btn app-form__btn" :disabled="(enableBtn === false || isAgree === false)" @click="register">Регистрация</button>
         </div>
         
     </form>
@@ -38,9 +41,19 @@ export default {
             return this.$store.getters['login/getInpForRegisterForm']
         },
         // проверим, все ли поля валидны и разблокируем кнопку !!! вынесено в миксин
-        // enableBtn
-        
+        // enableBtn 
+        getRegisterResult() {
+            return this.$store.getters['login/getRegisterResult']
+        }       
     },
+    methods:{
+        register(){
+            // console.log(this.getInps)
+            const {email, nickname, password} = this.getInps
+            // console.log(email.value)
+            this.$store.dispatch('login/register', [email.value, nickname.value, password.value])
+        }
+    }
 }
 </script>
 

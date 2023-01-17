@@ -21,7 +21,7 @@ export default {
         return {
             currentTab: "LoginForm",
             tabs: [
-                { label: 'Логин', name: 'LoginForm' },
+                { label: 'Войти', name: 'LoginForm' },
                 { label: 'Регистрация', name: 'RegisterForm' },
             ],
         }

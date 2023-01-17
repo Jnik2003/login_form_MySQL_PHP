@@ -44,3 +44,11 @@ body {
   text-align: left;
   word-wrap: break-all;
 }
+.errors {
+  text-align: left;  
+}
+.errors p {
+  font-size: 14px;
+  color: red;
+  margin: 0;
+}

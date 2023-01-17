@@ -4,7 +4,9 @@ export default {
     // Пользователь залогинен
     isUserLoggedIn: false,
     // пользователь зарегистрирован
-    isUserRegistered: true,
+    isUserRegistered: false,
+    // сообщение - результат регистрации
+    registerResultMessage: '',
     //стоит ли галочка "Запомнить меня"
     isRememberMe: false,
     //сообщение для ошибки входа
@@ -31,6 +33,16 @@ export default {
     getLoginError(state) {
       return state.loginError
     },
+    getRegisterResult(state){
+      return state.registerResultMessage
+    },
+    getUserData(state){
+      return function(value){
+        console.log(state.user[value])
+        return state.user[value]
+      }
+      
+    }
   },
   mutations: {
     updInputValue(state, arr) {
@@ -52,14 +64,22 @@ export default {
     },
     login(state, value) {
       state.isUserLoggedIn = value
+      state.inpForLoginForm = inpLoginFormLayout()
     },
     loginError(state, value) {
-      state.loginError = value      
+      state.loginError = value
     },
     // setUserData(state, [email, nickname]){
-    setUserData(state, obj){
-      state.user = obj;
+    setUserData(state, obj) {
+      state.user = obj
     },
+    register(state, value){
+      state.isUserRegistered = value
+      state.inpForRegisterForm = inpRegisterFormLayout()
+    },
+    registerResult(state, value){
+      state.registerResultMessage = value
+    }
   },
   actions: {
     updInputValue({ commit }, arr) {
@@ -79,15 +99,19 @@ export default {
               'Content-Type': 'application/x-www-form-urlencoded',
             },
             withCredentials: true,
-            body: JSON.stringify([email.value, password.value, getters.getIsRememberMe]),
+            body: JSON.stringify([
+              email.value,
+              password.value,
+              getters.getIsRememberMe,
+            ]),
           },
-        ) 
+        )
         let res_from_login_php = await response.json()
         // если пользователь найден в БД
         if (res_from_login_php != '0') {
           // и если галочка запомнить стоит - создаем запись в ЛС hash, ip,
           if (getters.getIsRememberMe === true) {
-            let {hash, ip} = res_from_login_php
+            let { hash, ip } = res_from_login_php
             // запишем в ЛС hash ip чтобы сделать проверку в autologin.php
             commit('createLS', [hash, ip])
           } else {
@@ -99,7 +123,6 @@ export default {
           commit('loginError', '')
           // заполним объект user для данных личного кабинета из полученного объекта
           commit('setUserData', res_from_login_php)
-          
         } else {
           commit('login', false)
           commit('loginError', 'Неверный логин или пароль')
@@ -130,14 +153,42 @@ export default {
           commit('loginError', '')
           // заполним объект user для данных личного кабинета из полученного объекта
           commit('setUserData', res_autologin)
-        }
-        else{
+        } else {
           commit('login', false)
           commit('loginError', 'Войдите заново')
           commit('delLS')
         }
       } catch (error) {
         console.log('err autologin')
+      }
+    },
+    async register({ commit }, [email, nickname, password]) {
+      try {
+        let response = await fetch(
+          `${process.env.VUE_APP_URL_TO_HANDLER}register.php`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            withCredentials: true,
+            body: JSON.stringify([email, nickname, password]),
+          },
+        )
+        // let res_register = await response.json()
+        let res_register = await response.text()
+        console.log(res_register)
+        if(res_register === '1'){
+          commit('register', true)
+          commit('registerResult', 'Вы зарегистрированы')
+        }
+        else{
+          commit('register', false)
+          commit('registerResult', 'Такой пользователь уже существует')
+        }
+
+      } catch (error) {
+        console.log('Register error')
       }
     },
   },

@@ -4,6 +4,12 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
     </nav>
+    <div class="user-info" v-if="$store.getters['login/getIsUserLoggedIn']" >
+      <p v-show="$store.getters['login/getUserData']">Привет {{getUserData('nickname')}}</p>
+    </div>
+    <div class="user-info" v-else>
+      <p>Привет, Гость</p>
+    </div>
   </header>
   <main>
     <!-- Анимация перехода между страницами (один в один + стили route, т.е. router-view в эту конструкцию)-->
@@ -20,6 +26,11 @@
 
 <script>
 export default {
+  computed:{
+    getUserData(){
+      return this.$store.getters['login/getUserData']
+    },
+  },
 
   created() {
     if (localStorage.getItem("hash") && localStorage.getItem("ip")) {
