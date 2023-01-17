@@ -19,19 +19,23 @@
 </template>
 
 <script>
-export default{
+export default {
 
-  async created(){
-    console.log('created')
-    try {
-      let response = await fetch(`${process.env.VUE_APP_URL_TO_HANDLER}autologin.php`)
-      let res_autologin = await response.text()
-      console.log(res_autologin)
-    } catch (error) {
-      console.log('err autologin')
+  created() {
+    if (localStorage.getItem("hash") && localStorage.getItem("ip")) {
+      console.log(localStorage.getItem("hash"));
+      console.log(localStorage.getItem("ip"));
+      this.$store.dispatch("login/autologin", [
+        localStorage.getItem("hash"),
+        localStorage.getItem("ip"),
+      ]);
+    } else {
+      console.log("no");
     }
-  }, 
+  },
 }
+
+
 </script>
 
 <style lang="scss">

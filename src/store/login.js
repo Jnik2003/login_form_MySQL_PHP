@@ -12,6 +12,8 @@ export default {
     // шаблон инпутов
     inpForRegisterForm: inpRegisterFormLayout(),
     inpForLoginForm: inpLoginFormLayout(),
+    // объект user с личными данными (после успешного логина)
+    user: null,
   },
   getters: {
     getInpForRegisterForm(state) {
@@ -20,15 +22,15 @@ export default {
     getInpForLoginForm(state) {
       return state.inpForLoginForm
     },
-    getIsRememberMe(state){
+    getIsRememberMe(state) {
       return state.isRememberMe
     },
-    getIsUserLoggedIn(state){
+    getIsUserLoggedIn(state) {
       return state.isUserLoggedIn
     },
-    getLoginError(state){
+    getLoginError(state) {
       return state.loginError
-    }
+    },
   },
   mutations: {
     updInputValue(state, arr) {
@@ -36,74 +38,106 @@ export default {
       state[inpFor][key].activated = true
       state[inpFor][key].valid = inpObj.valid
     },
-    isRememberMeToggle(state, value){
+    isRememberMeToggle(state, value) {
       state.isRememberMe = value
     },
-    createLS(state, [hash, ip]){
+    createLS(state, [hash, ip]) {
       console.log(hash, ip)
       localStorage.setItem('hash', hash)
-      localStorage.setItem('ip', ip)      
+      localStorage.setItem('ip', ip)
     },
     delLS(state) {
       localStorage.removeItem('hash')
-      localStorage.removeItem('ip')      
+      localStorage.removeItem('ip')
     },
-    login(state){
-      state.isUserLoggedIn = true
+    login(state, value) {
+      state.isUserLoggedIn = value
     },
-    loginError(state, value){
-      state.loginError = value
-    }
+    loginError(state, value) {
+      state.loginError = value      
+    },
+    // setUserData(state, [email, nickname]){
+    setUserData(state, obj){
+      state.user = obj;
+    },
   },
   actions: {
     updInputValue({ commit }, arr) {
       commit('updInputValue', arr)
     },
-    isRememberMeToggle({commit}, value){
+    isRememberMeToggle({ commit }, value) {
       commit('isRememberMeToggle', value)
     },
     async login({ commit, getters }) {
-      // console.log(getters.getInpForLoginForm)
-      const {email, password} = getters.getInpForLoginForm
-      const rem = getters.getIsRememberMe
-      // console.log(email.value)
-      // console.log(password.value)
-      // console.log(getters.getIsRememberMe)
+      const { email, password } = getters.getInpForLoginForm
       try {
-        // let response = await fetch("http://test4.jnik.s53.hhos.ru/php/login.php", { // production
-        let response = await fetch(`${process.env.VUE_APP_URL_TO_HANDLER}login.php`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+        let response = await fetch(
+          `${process.env.VUE_APP_URL_TO_HANDLER}login.php`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            withCredentials: true,
+            body: JSON.stringify([email.value, password.value, getters.getIsRememberMe]),
           },
-          withCredentials: true,
-          body: JSON.stringify([email.value, password.value, rem]),
-        }) // serve
+        ) 
         let res_from_login_php = await response.json()
-        // res_from_login_php = JSON.parse(res_from_login_php)
-        console.log(res_from_login_php)
-       
-        // console.log(JSON.parse(res_from_login_php))
         // если пользователь найден в БД
         if (res_from_login_php != '0') {
-          // и если галочка запомнить стоит - создаем запись в ЛС hash, ip, 
-          if (getters.getIsRememberMe) {
-            let hash = res_from_login_php[0]
-            let ip = res_from_login_php[1]
-            console.log(hash, ip)
+          // и если галочка запомнить стоит - создаем запись в ЛС hash, ip,
+          if (getters.getIsRememberMe === true) {
+            let {hash, ip} = res_from_login_php
+            // запишем в ЛС hash ip чтобы сделать проверку в autologin.php
             commit('createLS', [hash, ip])
           } else {
+            // если галочка не стоит уберем записи из ЛС
             commit('delLS')
           }
-          commit('login')
+          // после всего выполним login и очистим ошибки входа
+          commit('login', true)
           commit('loginError', '')
-          // commit('userId', JSON.parse(res_from_login_php)[0]) // !!!!!!! дать id
+          // заполним объект user для данных личного кабинета из полученного объекта
+          commit('setUserData', res_from_login_php)
+          
         } else {
-          // console.log(JSON.parse(res_from_login_php))
+          commit('login', false)
           commit('loginError', 'Неверный логин или пароль')
+          commit('delLS')
+          commit('setUserData', null)
         }
       } catch (e) {
         console.log('err')
+      }
+    },
+    async autologin({ commit }, [hash, ip]) {
+      try {
+        let response = await fetch(
+          `${process.env.VUE_APP_URL_TO_HANDLER}autologin.php`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            withCredentials: true,
+            body: JSON.stringify([hash, ip]),
+          },
+        )
+        let res_autologin = await response.json()
+        console.log(res_autologin)
+        if (res_autologin != '0') {
+          commit('login', true)
+          commit('loginError', '')
+          // заполним объект user для данных личного кабинета из полученного объекта
+          commit('setUserData', res_autologin)
+        }
+        else{
+          commit('login', false)
+          commit('loginError', 'Войдите заново')
+          commit('delLS')
+        }
+      } catch (error) {
+        console.log('err autologin')
       }
     },
   },
