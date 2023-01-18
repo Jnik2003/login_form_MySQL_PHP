@@ -4,6 +4,11 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
+.container{
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
 .icon {
   font-size: 20px;
   transition: 0.3s;
@@ -23,6 +28,17 @@ body {
     border: none;
     background-color: burlywood;
     cursor: pointer;
+}
+.small-btn{
+    width: 70px;
+    height: 35px;
+    border: none;
+    border-radius: 2rem;
+    background-color: rgb(239, 150, 32);
+    cursor: pointer;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: .05rem;
 }
 .app-form{
   width: 100%;

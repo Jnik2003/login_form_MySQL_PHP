@@ -3,6 +3,7 @@ import RegisterForm from "@/components/login/RegisterForm"
 import LoginForm from "@/components/login/LoginForm"
 import SingleInput from "@/components/login/SingleInput"
 import IconsComp from "@/components/login/IconsComp"
+import ModalComp from "@/components/login/ModalComp"
 
 export default[
     MainFormsComp,
@@ -10,4 +11,5 @@ export default[
     LoginForm,
     SingleInput,
     IconsComp,
+    ModalComp,
 ]

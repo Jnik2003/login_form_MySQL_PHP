@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1 v-show="isUserLoggedIn">This is an about page</h1>
+    <h1 v-show="userLogged">This is an about page</h1>
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 export default{
   data(){
     return{
-      isUserLoggedIn: this.$store.getters['login/getIsUserLoggedIn'],
+     
     }
   }
 }

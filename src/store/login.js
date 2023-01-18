@@ -37,11 +37,14 @@ export default {
       return state.registerResultMessage
     },
     getUserData(state){
+      // это для получения конкретного свойства из объекта user
       return function(value){
         console.log(state.user[value])
         return state.user[value]
-      }
-      
+      }      
+    },
+    getAllUserData(state){
+      return state.user
     }
   },
   mutations: {
@@ -79,6 +82,11 @@ export default {
     },
     registerResult(state, value){
       state.registerResultMessage = value
+    },
+    logout(state){
+      state.isUserLoggedIn = false
+      state.isUserRegistered = false
+      state.user = null
     }
   },
   actions: {
@@ -191,6 +199,9 @@ export default {
         console.log('Register error')
       }
     },
+    logout({commit}){
+      commit('logout')
+    }
   },
   modules: {},
 }
