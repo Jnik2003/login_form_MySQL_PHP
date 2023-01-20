@@ -14,6 +14,7 @@
 
 
         </div>
+        
         <div class="single-input__svg">
             <IconsComp :inp="inp" :ind="ind" />
         </div>

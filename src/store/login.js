@@ -39,7 +39,6 @@ export default {
     getUserData(state){
       // это для получения конкретного свойства из объекта user
       return function(value){
-        console.log(state.user[value])
         return state.user[value]
       }      
     },
@@ -74,6 +73,7 @@ export default {
     },
     // setUserData(state, [email, nickname]){
     setUserData(state, obj) {
+      console.log(obj)
       state.user = obj
     },
     register(state, value){
@@ -155,7 +155,7 @@ export default {
           },
         )
         let res_autologin = await response.json()
-        console.log(res_autologin)
+        // console.log(res_autologin)
         if (res_autologin != '0') {
           commit('login', true)
           commit('loginError', '')
@@ -201,6 +201,26 @@ export default {
     },
     logout({commit}){
       commit('logout')
+    },
+    async updateuser({commit}, [id, property, newValue]){
+      try {
+        let response = await fetch(
+          `${process.env.VUE_APP_URL_TO_HANDLER}updateuser.php`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            withCredentials: true,
+            body: JSON.stringify([id, property, newValue]),
+          },
+        )
+        // let res_update = await response.json()
+        let res_update = await response.text()
+        console.log(res_update)
+      } catch (error) {
+        console.log('update error')
+      }
     }
   },
   modules: {},

@@ -4,6 +4,7 @@ import LoginForm from "@/components/login/LoginForm"
 import SingleInput from "@/components/login/SingleInput"
 import IconsComp from "@/components/login/IconsComp"
 import ModalComp from "@/components/login/ModalComp"
+import SingleAccount from "@/components/login/SingleAccount"
 
 export default[
     MainFormsComp,
@@ -12,4 +13,5 @@ export default[
     SingleInput,
     IconsComp,
     ModalComp,
+    SingleAccount,
 ]
